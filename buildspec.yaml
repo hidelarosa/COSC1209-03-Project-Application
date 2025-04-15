@@ -20,7 +20,7 @@ phases:
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions...
-      - printf '[{"name":"%s","imageUri":"%s"}]' "flask-app" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
+      - printf '[{"name":"%s","imageUri":"%s"}]' "main" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
 
 artifacts:
   files:
