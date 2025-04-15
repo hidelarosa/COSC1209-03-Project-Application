@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microservices Frontend</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .thread, .post, .user {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .thread {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+    .post {
+      background-color: #f9f9f9;
+    }
+    .user {
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Thread Details</h1>
+
+  <label for="threadId">Enter Thread ID: </label>
+  <input type="number" id="threadId" placeholder="Enter thread ID">
+  <button onclick="fetchThreadData()">Fetch Thread</button>
+
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    async function fetchThreadData() {
+      const threadId = document.getElementById('threadId').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';  // Clear previous result
+
+      if (!threadId) {
+        resultDiv.innerHTML = 'Please enter a valid thread ID.';
+        return;
+      }
+
+      try {
+        const response = await axios.get(`/api/threads/${threadId}/full`);
+        const data = response.data;
+
+        if (data) {
+          // Display Thread Information
+          const threadHtml = `
+            <div class="thread">
+              <strong>Thread Title:</strong> ${data.thread.title}<br>
+              <strong>Created By User ID:</strong> ${data.thread.createdBy}
+            </div>
+          `;
+
+          // Display Posts Information
+          let postsHtml = '<div class="posts"><strong>Posts:</strong>';
+          data.posts.forEach(post => {
+            postsHtml += `
+              <div class="post">
+                <strong>Post by User ${post.user}:</strong> ${post.text}
+              </div>
+            `;
+          });
+          postsHtml += '</div>';
+
+          // Display Users Information
+          let usersHtml = '<div class="users"><strong>Users:</strong>';
+          data.users.forEach(user => {
+            usersHtml += `
+              <div class="user">
+                <strong>Name:</strong> ${user.name} <br>
+                <strong>Username:</strong> ${user.username} <br>
+                <strong>Bio:</strong> ${user.bio}
+              </div>
+            `;
+          });
+          usersHtml += '</div>';
+
+          // Combine all data and display it
+          resultDiv.innerHTML = threadHtml + postsHtml + usersHtml;
+        } else {
+          resultDiv.innerHTML = 'Thread not found!';
+        }
+      } catch (error) {
+        resultDiv.innerHTML = 'Error fetching data!';
+        console.error('Error:', error);
+      }
+    }
+  </script>
+
+</body>
+</html>
