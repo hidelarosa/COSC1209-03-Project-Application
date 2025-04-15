@@ -12,9 +12,10 @@ def index():
 def get_thread_data(thread_id):
     try:
         # Use ECS service names as hostnames for internal communication
-        thread_response = requests.get(f'http://threads-service:3002/api/threads/{thread_id}')
-        posts_response = requests.get(f'http://posts-service:3001/api/posts/in-thread/{thread_id}')
-        users_response = requests.get(f'http://users-service:3003/api/users')
+    thread_response = requests.get(f'http://threads-service.fargate-microservices:3002/api/threads/{thread_id}')
+    posts_response = requests.get(f'http://posts-service.fargate-microservices:3001/api/posts/in-thread/{thread_id}')
+    users_response = requests.get(f'http://users-service.fargate-microservices:3003/api/users')
+
 
         # Check if responses are successful
         if thread_response.status_code == 200 and posts_response.status_code == 200 and users_response.status_code == 200:
