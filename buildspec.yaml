@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 761018853069.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=761018853069.dkr.ecr.us-east-1.amazonaws.com/flask-app
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t flask-app .
+      - docker tag flask-app:latest 761018853069.dkr.ecr.us-east-1.amazonaws.com/flask-app:latest
+
+  post_build:
+    commands:
+      - echo Pushing the Docker images...
+      - docker push 761018853069.dkr.ecr.us-east-1.amazonaws.com/flask-app:latest
+      - echo Writing image definitions...
+      - printf '[{"name":"%s","imageUri":"%s"}]' "main" "761018853069.dkr.ecr.us-east-1.amazonaws.com/flask-app:latest" > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
